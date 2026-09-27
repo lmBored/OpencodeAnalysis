@@ -15,17 +15,19 @@ Analysis of [`anomalyco/opencode`](https://github.com/anomalyco/opencode), using
 
 Seed 42 was used for all random sample. `out/run_info.txt` records the window, collection time, seed and frame sizes.
 
-| Data | Octokit | Scope |
-|---|---|---|
-| Commits | `Repository.Commit.GetAll` (`since`/`until`) | all commits on `dev` in the window |
-| Pull requests | `PullRequest.GetAllForRepository` (created desc) | all PRs created in the window |
-| Contributors | `Repository.GetAllContributors(anon: true)` | all time |
-| PRs reviewed per person | `Search.SearchIssues` `is:pr reviewed-by:X -author:X created:<window>` | candidates = top 40 committers U (union with) top 40 PR authors |
-| Author x reviewer pairs | `Search.SearchIssues` `is:pr author:A reviewed-by:B created:<window>` | all ordered pairs of the top 10 humans |
-| Review comments | `PullRequest.ReviewComment.GetAllForRepository` | whole repo, window |
-| Conversation comments | `Issue.Comment.GetAllForRepository` | whole repo, window |
-| Reviews | `PullRequest.Review.GetAll` | **targeted**: pair PRs where the reviewer also commented |
-| Changed files | `PullRequest.Files` | **random**: 150 merged PRs each top 10 human (seed 42) |
+| Data | Scope |
+|---|---|
+| Commits | all commits on `dev` in the window |
+| Pull requests | all PRs created in the window |
+| Contributors | all time |
+| PRs reviewed per person | candidates = top 40 committers U (union with) top 40 PR authors |
+| Author x reviewer pairs | all ordered pairs of the top 10 humans |
+| Review comments | whole repo, window |
+| Conversation comments | whole repo, window |
+| Reviews | **targeted**: pair PRs where the reviewer also commented |
+| Changed files | **random**: 150 merged PRs each top 10 human (seed 42) |
+
+To see what Octokit endpoint was used, read `GitHubFetcher.cs`
 
 ## Note
 
