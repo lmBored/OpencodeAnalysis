@@ -1,0 +1,7 @@
+actions-user
+blacksmith-sh[bot]
+Copilot
+github-actions[bot]
+opencode
+opencode-agent[bot]
+porter-deployment-app[bot]
