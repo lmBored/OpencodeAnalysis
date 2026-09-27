@@ -1,0 +1,1 @@
+[{"PrNumber":51377,"PrAuthor":"nexxeln","Path":"packages/ai/src/protocols/deepgram-speech.ts","Additions":16,"Deletions":8},{"PrNumber":51377,"PrAuthor":"nexxeln","Path":"packages/ai/src/protocols/openai-speech.ts","Additions":10,"Deletions":1},{"PrNumber":51377,"PrAuthor":"nexxeln","Path":"packages/ai/test/speech.test.ts","Additions":40,"Deletions":1}]

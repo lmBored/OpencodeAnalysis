@@ -1,0 +1,1 @@
+[{"PrNumber":38694,"PrAuthor":"nexxeln","Path":"packages/ai/src/providers/anthropic-compatible.ts","Additions":3,"Deletions":1},{"PrNumber":38694,"PrAuthor":"nexxeln","Path":"packages/ai/src/providers/anthropic.ts","Additions":3,"Deletions":1},{"PrNumber":38694,"PrAuthor":"nexxeln","Path":"packages/ai/test/provider-package.test.ts","Additions":14,"Deletions":0}]

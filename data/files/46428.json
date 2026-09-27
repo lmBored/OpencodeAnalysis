@@ -1,0 +1,1 @@
+[{"PrNumber":46428,"PrAuthor":"nexxeln","Path":"packages/ai/src/protocols/open-responses.ts","Additions":23,"Deletions":14},{"PrNumber":46428,"PrAuthor":"nexxeln","Path":"packages/ai/src/protocols/openai-responses.ts","Additions":5,"Deletions":9},{"PrNumber":46428,"PrAuthor":"nexxeln","Path":"packages/ai/test/provider/conversation-lowering.test.ts","Additions":30,"Deletions":0}]

@@ -1,0 +1,1 @@
+[{"PrNumber":45197,"PrAuthor":"nexxeln","Path":"packages/ai/src/providers/amazon-bedrock-mantle.ts","Additions":9,"Deletions":3},{"PrNumber":45197,"PrAuthor":"nexxeln","Path":"packages/ai/test/provider/bedrock-mantle.test.ts","Additions":2,"Deletions":0}]

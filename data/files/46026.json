@@ -1,0 +1,1 @@
+[{"PrNumber":46026,"PrAuthor":"kitlangton","Path":"packages/core/src/session/runner/publish-llm-event.ts","Additions":4,"Deletions":2},{"PrNumber":46026,"PrAuthor":"kitlangton","Path":"packages/core/test/session-runner-tool-events.test.ts","Additions":94,"Deletions":3}]

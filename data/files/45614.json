@@ -1,0 +1,1 @@
+[{"PrNumber":45614,"PrAuthor":"kitlangton","Path":"packages/core/src/session/execution.ts","Additions":18,"Deletions":18},{"PrNumber":45614,"PrAuthor":"kitlangton","Path":"packages/core/src/session/runner/llm.ts","Additions":27,"Deletions":28},{"PrNumber":45614,"PrAuthor":"kitlangton","Path":"packages/core/src/session/runner/step.ts","Additions":12,"Deletions":13}]

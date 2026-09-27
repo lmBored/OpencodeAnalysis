@@ -1,0 +1,1 @@
+[{"PrNumber":22772,"PrAuthor":"thdxr","Path":"packages/opencode/.opencode/package-lock.json","Additions":0,"Deletions":31},{"PrNumber":22772,"PrAuthor":"thdxr","Path":"packages/opencode/src/config/config.ts","Additions":10,"Deletions":55},{"PrNumber":22772,"PrAuthor":"thdxr","Path":"packages/opencode/test/config/config.test.ts","Additions":27,"Deletions":138}]

@@ -1,0 +1,1 @@
+[{"PrNumber":43129,"PrAuthor":"rekram1-node","Path":"packages/ai/src/protocols/gemini.ts","Additions":1,"Deletions":0},{"PrNumber":43129,"PrAuthor":"rekram1-node","Path":"packages/ai/src/providers/google-vertex.ts","Additions":32,"Deletions":8},{"PrNumber":43129,"PrAuthor":"rekram1-node","Path":"packages/ai/test/provider/google-vertex.test.ts","Additions":21,"Deletions":0}]

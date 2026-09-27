@@ -1,0 +1,1 @@
+[{"PrNumber":27251,"PrAuthor":"nexxeln","Path":"packages/opencode/src/server/routes/instance/httpapi/middleware/error.ts","Additions":1,"Deletions":1},{"PrNumber":27251,"PrAuthor":"nexxeln","Path":"packages/opencode/test/server/httpapi-error-middleware.test.ts","Additions":30,"Deletions":0}]

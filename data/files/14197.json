@@ -1,0 +1,1 @@
+[{"PrNumber":14197,"PrAuthor":"Hona","Path":"packages/desktop/src-tauri/Cargo.lock","Additions":1,"Deletions":0},{"PrNumber":14197,"PrAuthor":"Hona","Path":"packages/desktop/src-tauri/Cargo.toml","Additions":3,"Deletions":0},{"PrNumber":14197,"PrAuthor":"Hona","Path":"packages/desktop/src-tauri/src/cli.rs","Additions":18,"Deletions":6}]

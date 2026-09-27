@@ -1,0 +1,1 @@
+[{"PrNumber":45457,"PrAuthor":"kitlangton","Path":".changeset/model-package-name.md","Additions":5,"Deletions":0},{"PrNumber":45457,"PrAuthor":"kitlangton","Path":"packages/core/src/model-resolver.ts","Additions":3,"Deletions":3},{"PrNumber":45457,"PrAuthor":"kitlangton","Path":"packages/core/test/model-resolver.test.ts","Additions":3,"Deletions":3}]

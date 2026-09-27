@@ -1,0 +1,1 @@
+[{"PrNumber":46296,"PrAuthor":"rekram1-node","Path":"packages/ai/src/protocols/bedrock-converse.ts","Additions":9,"Deletions":1},{"PrNumber":46296,"PrAuthor":"rekram1-node","Path":"packages/ai/test/provider/bedrock-converse.test.ts","Additions":73,"Deletions":0}]
