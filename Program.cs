@@ -29,6 +29,9 @@ switch (command)
     case "collaboration":
         Reports.Collaboration(Dataset.Load(cache), run, outDir, TopN);
         break;
+    case "activities":
+        Reports.Activities(Dataset.Load(cache), run, outDir, TopN);
+        break;
     case "all":
         await Fetch();
         var data = Dataset.Load(cache);
@@ -36,7 +39,7 @@ switch (command)
         Reports.Collaboration(data, run, outDir, TopN);
         break;
     default:
-        Console.Error.WriteLine("usage: dotnet run -- [fetch|contributors|collaboration|all]");
+        Console.Error.WriteLine("usage: dotnet run -- [fetch|contributors|collaboration|activities|all]");
         return 1;
 }
 return 0;

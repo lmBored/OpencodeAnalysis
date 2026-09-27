@@ -1,4 +1,4 @@
-namespace OpenCodeAnalysis;
+namespace GhCore;
 
 public static class Bots
 {

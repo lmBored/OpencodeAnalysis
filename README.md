@@ -9,7 +9,18 @@ Analysis of [`anomalyco/opencode`](https://github.com/anomalyco/opencode), using
 | `dotnet run -- fetch` | Downloads and caches everything page by page. |
 | `dotnet run -- contributors` | Offline: activity metrics, top 10 humans + bots row, scopes, seeded commit samples. |
 | `dotnet run -- collaboration` | Offline: author x reviewer matrix, targeted PR thread list, co-edit counterexample. |
-| `dotnet run -- all` | All of the above. |
+| `dotnet run -- activities` | Offline: weekly series + counts table (LaTeX) from `data/activities/` (run GhActivities first). |
+| `dotnet run -- all` | fetch + contributors + collaboration. |
+
+GhActivities (default output dir `data/activities`, run from the repo root):
+
+```text
+dotnet run --project GhActivities -- [outDir] [--from=yyyy-MM-dd] [--to=yyyy-MM-dd] [--refresh]
+```
+
+It writes `commits.csv`, `prs.csv`, `issues.csv`, `releases.csv`, `reviews.csv`, `search_weekly.csv`, `repo.json`,
+`commit_activity.json`, `summary.txt`, `run.log`.
+
 
 ## Data collected
 

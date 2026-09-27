@@ -9,6 +9,15 @@
 
   <ItemGroup>
     <PackageReference Include="Octokit" Version="14.0.0" />
+    <ProjectReference Include="GhCore\GhCore.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Sibling projects live under this directory but must not compile into this one. -->
+    <Compile Remove="GhActivities/**" />
+    <Compile Remove="GhCore/**" />
+    <None Remove="GhActivities/**" />
+    <None Remove="GhCore/**" />
   </ItemGroup>
 
 </Project>

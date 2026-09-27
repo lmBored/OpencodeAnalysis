@@ -1,5 +1,5 @@
-using System.Diagnostics;
 using Octokit;
+using GhCore;
 
 namespace OpenCodeAnalysis;
 
@@ -8,89 +8,20 @@ public class GitHubFetcher
 {
     public const string Owner = "anomalyco";
     public const string Repo = "opencode";
-    const int PageSize = 100;
+    const int PageSize = RestCaller.PageSize;
 
-    readonly GitHubClient _client;
+    readonly RestCaller _rest;
     readonly Cache _cache;
-    DateTimeOffset _lastSearch = DateTimeOffset.MinValue;
 
-    public int ApiCalls { get; private set; }
+    public int ApiCalls => _rest.ApiCalls;
 
     public GitHubFetcher(Cache cache)
     {
         _cache = cache;
-        _client = new GitHubClient(new ProductHeaderValue("OpenCodeAnalysis-2IRR80"))
-        {
-            Credentials = new Credentials(ResolveToken()),
-        };
+        var etag = new FileResponseCache(Path.Combine(cache.Root, "http-cache"), refresh: false);
+        etag.Prepare();
+        _rest = new RestCaller("OpenCodeAnalysis-2IRR80", TokenResolver.Resolve(), etag, Console.WriteLine);
     }
-
-    static string ResolveToken()
-    {
-        var env = Environment.GetEnvironmentVariable("GITHUB_TOKEN");
-        if (!string.IsNullOrWhiteSpace(env)) return env.Trim();
-        var psi = new ProcessStartInfo("gh", "auth token") { RedirectStandardOutput = true, UseShellExecute = false };
-        using var p = Process.Start(psi) ?? throw new InvalidOperationException("`gh` not working.");
-        var token = p.StandardOutput.ReadToEnd().Trim();
-        p.WaitForExit();
-        if (string.IsNullOrEmpty(token)) throw new InvalidOperationException("Set GITHUB_TOKEN or run `gh auth login`.");
-        return token;
-    }
-
-    /// One API call, waiting for the rate limit reset and retrying.
-    async Task<T> Call<T>(Func<Task<T>> call, bool search = false)
-    {
-        for (var attempt = 1; ; attempt++)
-        {
-            if (search)
-            {
-                // Search API: 30 requests/minute.
-                var wait = _lastSearch.AddSeconds(2.2) - DateTimeOffset.UtcNow;
-                if (wait > TimeSpan.Zero) await Task.Delay(wait);
-                _lastSearch = DateTimeOffset.UtcNow;
-            }
-            try
-            {
-                ApiCalls++;
-                var result = await call();
-                var rate = _client.GetLastApiInfo()?.RateLimit;
-                if (!search && rate is { Remaining: < 25 }) await SleepUntil(rate.Reset, "primary rate limit low");
-                return result;
-            }
-            catch (RateLimitExceededException e)
-            {
-                await SleepUntil(e.Reset, "primary rate limit exceeded");
-            }
-            catch (SecondaryRateLimitExceededException) when (attempt < 8)
-            {
-                await SleepFor(TimeSpan.FromSeconds(60 * attempt), "secondary rate limit");
-            }
-            catch (AbuseException e) when (attempt < 8)
-            {
-                await SleepFor(TimeSpan.FromSeconds(e.RetryAfterSeconds ?? 60), "abuse detection");
-            }
-            catch (ApiException e) when (attempt < 5 && (int)e.StatusCode >= 500)
-            {
-                await SleepFor(TimeSpan.FromSeconds(5 * attempt), $"server error {(int)e.StatusCode}");
-            }
-            catch (HttpRequestException) when (attempt < 5)
-            {
-                await SleepFor(TimeSpan.FromSeconds(5 * attempt), "network error");
-            }
-        }
-    }
-
-    static Task SleepUntil(DateTimeOffset reset, string why) =>
-        SleepFor(reset - DateTimeOffset.UtcNow + TimeSpan.FromSeconds(5), why);
-
-    static async Task SleepFor(TimeSpan span, string why)
-    {
-        if (span < TimeSpan.Zero) return;
-        Console.WriteLine($"  [{why}] sleeping {span.TotalMinutes:F1} min");
-        await Task.Delay(span);
-    }
-
-    static ApiOptions Page(int page) => new() { PageSize = PageSize, PageCount = 1, StartPage = page };
 
     static string Truncate(string? s, int max = 4000) => s is null ? "" : s.Length <= max ? s : s[..max];
 
@@ -103,8 +34,8 @@ public class GitHubFetcher
 
     public Task<List<CommitRecord>> CommitsAsync(RunInfo run) =>
         _cache.Paged<CommitRecord>("commits",
-            async page => (await Call(() => _client.Repository.Commit.GetAll(Owner, Repo,
-                    new CommitRequest { Since = run.Since, Until = run.Until }, Page(page))))
+            async page => (await _rest.Call(() => _rest.Client.Repository.Commit.GetAll(Owner, Repo,
+                    new CommitRequest { Since = run.Since, Until = run.Until }, RestCaller.Page(page))))
                 .Select(c => new CommitRecord(
                     c.Sha,
                     c.Author?.Login,
@@ -119,13 +50,13 @@ public class GitHubFetcher
     public async Task<List<PullRecord>> PullsAsync(RunInfo run)
     {
         var raw = await _cache.Paged<PullRecord>("pulls",
-            async page => (await Call(() => _client.PullRequest.GetAllForRepository(Owner, Repo,
+            async page => (await _rest.Call(() => _rest.Client.PullRequest.GetAllForRepository(Owner, Repo,
                     new PullRequestRequest
                     {
                         State = ItemStateFilter.All,
                         SortProperty = PullRequestSort.Created,
                         SortDirection = SortDirection.Descending,
-                    }, Page(page))))
+                    }, RestCaller.Page(page))))
                 .Select(p => new PullRecord(
                     p.Number,
                     p.User.Login,
@@ -146,13 +77,13 @@ public class GitHubFetcher
     public async Task<List<CommentRecord>> ReviewCommentsAsync(RunInfo run)
     {
         var raw = await _cache.Segmented<CommentRecord>("review_comments", run.Since,
-            async (since, page) => (await Call(() => _client.PullRequest.ReviewComment.GetAllForRepository(Owner, Repo,
+            async (since, page) => (await _rest.Call(() => _rest.Client.PullRequest.ReviewComment.GetAllForRepository(Owner, Repo,
                     new PullRequestReviewCommentRequest
                     {
                         Since = since,
                         Sort = PullRequestReviewCommentSort.Created,
                         Direction = SortDirection.Ascending,
-                    }, Page(page))))
+                    }, RestCaller.Page(page))))
                 .Where(c => c.User is not null)
                 .Select(c => new CommentRecord("review", NumberFromUrl(c.PullRequestUrl), c.User.Login,
                     Bots.IsBot(c.User.Login, c.User.Type?.ToString()), c.Path, Truncate(c.Body), c.CreatedAt, c.HtmlUrl))
@@ -165,13 +96,13 @@ public class GitHubFetcher
     public async Task<List<CommentRecord>> IssueCommentsAsync(RunInfo run)
     {
         var raw = await _cache.Segmented<CommentRecord>("issue_comments", run.Since,
-            async (since, page) => (await Call(() => _client.Issue.Comment.GetAllForRepository(Owner, Repo,
+            async (since, page) => (await _rest.Call(() => _rest.Client.Issue.Comment.GetAllForRepository(Owner, Repo,
                     new IssueCommentRequest
                     {
                         Since = since,
                         Sort = IssueCommentSort.Created,
                         Direction = SortDirection.Ascending,
-                    }, Page(page))))
+                    }, RestCaller.Page(page))))
                 .Where(c => c.User is not null)
                 .Select(c => new CommentRecord("issue", NumberFromUrl(c.HtmlUrl), c.User.Login,
                     Bots.IsBot(c.User.Login, c.User.Type?.ToString()), null, Truncate(c.Body), c.CreatedAt, c.HtmlUrl))
@@ -185,7 +116,7 @@ public class GitHubFetcher
     /// (anonymous = commit emails not linked to account)
     public Task<List<ContributorRecord>> ContributorsAsync() =>
         _cache.Paged<ContributorRecord>("contributors",
-            async page => (await Call(() => _client.Repository.GetAllContributors(Owner, Repo, true, Page(page))))
+            async page => (await _rest.Call(() => _rest.Client.Repository.GetAllContributors(Owner, Repo, true, RestCaller.Page(page))))
                 .Select(c => new ContributorRecord(c.Login, null, c.Type?.ToString(), c.Contributions))
                 .ToList(),
             items => items.Count < PageSize);
@@ -197,7 +128,7 @@ public class GitHubFetcher
         _cache.GetOrFetch($"review_counts/{login}", async () =>
         {
             var q = $"repo:{Owner}/{Repo} is:pr reviewed-by:{login} -author:{login} {Window(run)}";
-            var result = await Call(() => _client.Search.SearchIssues(new SearchIssuesRequest(q) { PerPage = 1 }), search: true);
+            var result = await _rest.Call(() => _rest.Client.Search.SearchIssues(new SearchIssuesRequest(q) { PerPage = 1 }), search: true);
             return new ReviewCount(login, result.TotalCount);
         });
 
@@ -211,7 +142,7 @@ public class GitHubFetcher
             for (var page = 1; page <= 10; page++)
             {
                 var p = page;
-                var result = await Call(() => _client.Search.SearchIssues(
+                var result = await _rest.Call(() => _rest.Client.Search.SearchIssues(
                     new SearchIssuesRequest(q) { PerPage = PageSize, Page = p }), search: true);
                 total = result.TotalCount;
                 numbers.AddRange(result.Items.Select(i => i.Number));
@@ -222,7 +153,7 @@ public class GitHubFetcher
 
     public Task<List<ReviewRecord>> ReviewsAsync(int number, string prAuthor) =>
         _cache.GetOrFetch($"reviews/{number}", async () =>
-            (await Call(() => _client.PullRequest.Review.GetAll(Owner, Repo, number)))
+            (await _rest.Call(() => _rest.Client.PullRequest.Review.GetAll(Owner, Repo, number)))
             .Where(r => r.User is not null)
             .Select(r => new ReviewRecord(number, prAuthor, r.User.Login, r.State.StringValue,
                 r.SubmittedAt, Truncate(r.Body), r.HtmlUrl))
@@ -230,7 +161,7 @@ public class GitHubFetcher
 
     public Task<List<PrFileRecord>> FilesAsync(int number, string prAuthor) =>
         _cache.GetOrFetch($"files/{number}", async () =>
-            (await Call(() => _client.PullRequest.Files(Owner, Repo, number)))
+            (await _rest.Call(() => _rest.Client.PullRequest.Files(Owner, Repo, number)))
             .Select(f => new PrFileRecord(number, prAuthor, f.FileName, f.Additions, f.Deletions))
             .ToList());
 }

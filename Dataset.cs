@@ -12,7 +12,8 @@ public record Dataset(
     List<CommentRecord> IssueComments,
     List<ReviewRecord> Reviews,
     List<PrFileRecord> Files,
-    List<int> FilesSample)
+    List<int> FilesSample,
+    ActivitiesData? Activities)
 {
     public static Dataset Load(Cache cache)
     {
@@ -38,6 +39,7 @@ public record Dataset(
             cache.Read<List<CommentRecord>>("issue_comments").Where(c => InWindow(c.CreatedAt)).DistinctBy(c => c.Url).ToList(),
             targeted.SelectMany(n => cache.Read<List<ReviewRecord>>($"reviews/{n}")).ToList(),
             sample.SelectMany(n => cache.Read<List<PrFileRecord>>($"files/{n}")).ToList(),
-            sample);
+            sample,
+            ActivitiesData.Load(Path.Combine(cache.Root, "activities")));
     }
 }

@@ -1,0 +1,12 @@
+repo: anomalyco/opencode (default branch dev)
+window: 2025-09-27..2026-09-26 (UTC)
+commits: 12951
+pull_requests: 22011 (8805 merged)
+issue_details: 21039
+issue_endpoint_items: 39838 (issues and PRs seen by the issues endpoint)
+releases: 474
+reviews: 4435 submitted in window on 2390 pull requests (GraphQL, in-window PRs only)
+discussions: 0 (has_discussions=false)
+repo_created_at: 2025-04-30
+stars: 210401, forks: 27834, open_issues_count: 6271, size_kb: 542323
+elapsed: 23.8 min
