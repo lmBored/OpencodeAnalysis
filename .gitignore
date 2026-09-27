@@ -3,3 +3,19 @@ obj/
 *.tmp
 http-cache/
 out-full/
+
+# fetch-resume page shards; the merged data/<name>.json is what reports read
+data/commits/
+data/pulls/
+data/review_comments/
+data/issue_comments/
+data/contributors/
+
+# OS / IDE / Python
+.vs/
+.idea/
+*.user
+*.suo
+__pycache__/
+*.pyc
+.DS_Store
