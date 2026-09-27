@@ -6,18 +6,18 @@ Seed: 42
 [All-time contributors, GET /repos/.../contributors?anon=1]
 entries total: 1017
   linked GitHub accounts: 456 (of which bots: 4)
-  anonymous (unlinked e-mail): 561
+  anonymous (unlinked email): 561
 
 [Last-year frame]
 commits: 12951
   bot commits: 3014
-  unattributed human commits (no login, e-mail not mappable): 258
-  distinct human commit authors (login or e-mail): 830
+  unattributed human commits (no login, email not mappable): 258
+  distinct human commit authors (login or email): 830
 PRs created: 22011 (bots: 1312, merged: 8805)
   distinct human PR authors: 5936
 distinct human accounts with >=1 commit or PR: 5947
 review comments: 4953; conversation comments: 122630
-review-count candidates (search API): 51
-top-10 humans: kitlangton, rekram1-node, adamdotdevin, thdxr, Hona, Brendonovich, nexxeln, iamdavidhill, jlongster, fwang
+review count candidates (search API): 51
+top 10 humans: kitlangton, rekram1-node, adamdotdevin, thdxr, Hona, Brendonovich, nexxeln, iamdavidhill, jlongster, fwang
 files sample: 1285 merged PRs (<=150 per top human, seed 42), 13452 file entries
 targeted reviews: PRs with fetched reviews = 30
