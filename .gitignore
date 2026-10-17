@@ -19,3 +19,7 @@ data/contributors/
 __pycache__/
 *.pyc
 .DS_Store
+
+# Opencode repository
+
+metrics/opencode
