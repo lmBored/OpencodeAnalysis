@@ -48,3 +48,19 @@ public record ReviewCount(string Login, int PrsReviewed);
 
 // PRs authored by Author on which Reviewer submitted at least one review
 public record PairReviews(string Author, string Reviewer, int Count, List<int> PrNumbers);
+
+// Item of the issues (an issue or a PR when IsPull) (all time, with author and closing date)
+public record IssueRecord(
+    int Number,
+    string Login,
+    bool IsBot,
+    bool IsPull,
+    DateTimeOffset CreatedAt,
+    DateTimeOffset UpdatedAt,
+    DateTimeOffset? ClosedAt,
+    string State,
+    string? StateReason,
+    string Title,
+    string Url);
+
+public record UserProfile(string Login, string Type, DateTimeOffset CreatedAt, string? Name, string? Bio, int PublicRepos, int Followers);

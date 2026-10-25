@@ -159,6 +159,71 @@ public class GitHubFetcher
                 r.SubmittedAt, Truncate(r.Body), r.HtmlUrl))
             .ToList());
 
+    /// Issues and PRs of issues since repo was created, ordered by last update.
+    public async Task<List<IssueRecord>> IssueItemsAsync(DateTimeOffset repoCreated)
+    {
+        var raw = await _cache.Segmented<IssueRecord>("issue_items", repoCreated,
+            async (since, page) => (await _rest.Call(() => _rest.Client.Issue.GetAllForRepository(Owner, Repo,
+                    new RepositoryIssueRequest
+                    {
+                        State = ItemStateFilter.All,
+                        Since = since,
+                        SortProperty = IssueSort.Updated,
+                        SortDirection = SortDirection.Ascending,
+                    }, RestCaller.Page(page))))
+                .Select(i => new IssueRecord(
+                    i.Number,
+                    i.User?.Login ?? "ghost",
+                    Bots.IsBot(i.User?.Login, i.User?.Type?.ToString()),
+                    i.PullRequest is not null,
+                    i.CreatedAt,
+                    i.UpdatedAt ?? i.CreatedAt,
+                    i.ClosedAt,
+                    i.State.StringValue,
+                    i.StateReason?.StringValue,
+                    Truncate(i.Title, 200),
+                    i.HtmlUrl))
+                .ToList(),
+            i => i.UpdatedAt,
+            items => items.Count < PageSize,
+            maxPages: 99); // api refuses page numbers beyond 10,000 items, so continue from the last update
+        // Items updated during the fetch appear twice and the last copy is the newest
+        return raw.AsEnumerable().Reverse().DistinctBy(i => i.Number).OrderBy(i => i.Number).ToList();
+    }
+
+    /// Issues opened inside the window.
+    public async Task<List<IssueRecord>> IssuesAsync(RunInfo run, DateTimeOffset repoCreated) =>
+        (await IssueItemsAsync(repoCreated))
+        .Where(i => !i.IsPull && i.CreatedAt >= run.Since && i.CreatedAt < run.Until)
+        .ToList();
+
+    /// PRs opened before the window, to differentiate newcomers from returning contributors
+    public async Task<List<IssueRecord>> PullsBeforeWindowAsync(RunInfo run, DateTimeOffset repoCreated) =>
+        (await IssueItemsAsync(repoCreated))
+        .Where(i => i.IsPull && i.CreatedAt < run.Since)
+        .ToList();
+
+    /// Account profile (type, creation date, bio) for accounts under review
+    public Task<UserProfile> UserAsync(string login) =>
+        _cache.GetOrFetch($"users/{login}", async () =>
+        {
+            // GraphQL review data drops the [bot] suffix of apps
+            foreach (var name in new[] { login, login + "[bot]" }.Distinct())
+            {
+                // Deleted or renamed accounts return 404
+                try
+                {
+                    var u = await _rest.Call(() => _rest.Client.User.Get(name));
+                    return new UserProfile(login, u.Type?.ToString() ?? "", u.CreatedAt, u.Name, Truncate(u.Bio, 300),
+                        u.PublicRepos, u.Followers);
+                }
+                catch (NotFoundException)
+                {
+                }
+            }
+            return new UserProfile(login, "NotFound", default, null, null, 0, 0);
+        });
+
     public Task<List<PrFileRecord>> FilesAsync(int number, string prAuthor) =>
         _cache.GetOrFetch($"files/{number}", async () =>
             (await _rest.Call(() => _rest.Client.PullRequest.Files(Owner, Repo, number)))
