@@ -83,6 +83,7 @@ pip install lizard==1.24.1
 packages it does not know about).
 
 `notes.txt` cites commit `b471c2b…`, while the clone is pinned at `bc5ebf0…`;
+There are two folders for two analyzed commits. Newest one is 'b471c2b…';
 line numbers in the notes can therefore be a few lines off.
 
 ### Which directory do I scan?
