@@ -36,6 +36,10 @@ switch (command)
     case "fetch-health":
         await FetchHealth();
         break;
+    case "health":
+        Reports.Health(Dataset.Load(cache), run, outDir, Path.Combine(projectDir, "data", "identity_overrides.json"),
+            Path.Combine(projectDir, "opencode", ".github", "TEAM_MEMBERS"));
+        break;
     case "all":
         await Fetch();
         var data = Dataset.Load(cache);
@@ -43,7 +47,7 @@ switch (command)
         Reports.Collaboration(data, run, outDir, TopN);
         break;
     default:
-        Console.Error.WriteLine("usage: dotnet run -- [fetch|contributors|collaboration|activities|fetch-health|all]");
+        Console.Error.WriteLine("usage: dotnet run -- [fetch|contributors|collaboration|activities|fetch-health|health|all]");
         return 1;
 }
 return 0;
