@@ -58,8 +58,10 @@ public static class PracticeCsv
         new MetricSet("design_review", [])
             .Add("issues_with_comments", r.IssuesWithComments, MetricKind.Count)
             .Add("issues_with_team_comment", r.IssuesWithTeam, MetricKind.Count)
-            .Add("design_requests", r.Requests.Count, MetricKind.Count)
-            .Add("design_requests_answered", r.Answered, MetricKind.Count)
+            .Add("design_keyword_matches", r.Requests.Count, MetricKind.Count)
+            .Add("design_requests", r.Requests.Count(x => x.Explicit), MetricKind.Count)
+            .Add("design_requests_team_replied", r.Requests.Count(x => x.Explicit && x.TeamReplied), MetricKind.Count)
+            .Add("design_requests_design_decisions", r.Requests.Count(x => x.Explicit && x.DesignDecision), MetricKind.Count)
             .Add("team_members", r.TeamSize, MetricKind.Count);
 
     static string FormatMetric(Metric metric) => metric.Kind switch
@@ -79,12 +81,16 @@ public static class PracticeCsv
 
     public static void WriteGateRequests(GateResult r, string outDir) =>
         Csv.Write(Path.Combine(outDir, "design_review_requests.csv"),
-            ["issue", "created", "login", "answered_by", "answer_hours", "title", "quote", "url"],
+            ["issue", "created", "login", "explicit", "team_replied", "design_decision",
+             "answered_by", "answer_hours", "title", "quote", "url"],
             r.Requests.Select(q => new[]
             {
                 q.Issue.Number.ToString(),
                 q.At.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
                 q.Login,
+                q.Explicit.ToString(),
+                q.TeamReplied.ToString(),
+                q.DesignDecision.ToString(),
                 q.AnswerLogin ?? "",
                 double.IsFinite(q.AnswerHours) ? Format.Number(q.AnswerHours, 1) : "",
                 q.Issue.Title,
