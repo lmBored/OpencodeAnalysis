@@ -1,0 +1,113 @@
+From 02c35352c499769b6848a68e416b5ef0bed7cc40 Mon Sep 17 00:00:00 2001
+From: tutorial <tutorial@example.invalid>
+Date: Thu, 1 Oct 2026 19:40:07 +0200
+Subject: [PATCH] Extract methods from GnuParser.flatten (tutorial demo)
+
+---
+ .../org/apache/commons/cli/GnuParser.java     | 85 ++++++++++++-------
+ 1 file changed, 52 insertions(+), 33 deletions(-)
+
+diff --git a/src/main/java/org/apache/commons/cli/GnuParser.java b/src/main/java/org/apache/commons/cli/GnuParser.java
+index 6d2b8715..3ecf8cf3 100644
+--- a/src/main/java/org/apache/commons/cli/GnuParser.java
++++ b/src/main/java/org/apache/commons/cli/GnuParser.java
+@@ -55,44 +55,63 @@ public class GnuParser extends Parser {
+     @Override
+     protected String[] flatten(final Options options, final String[] arguments, final boolean stopAtNonOption) {
+         final List<String> tokens = new ArrayList<>();
+-        boolean eatTheRest = false;
+         for (int i = 0; i < arguments.length; i++) {
+             final String arg = arguments[i];
+-            if (arg != null) {
+-                if (OptionFormatter.DEFAULT_LONG_OPT_PREFIX.equals(arg)) {
+-                    eatTheRest = true;
+-                    tokens.add(OptionFormatter.DEFAULT_LONG_OPT_PREFIX);
+-                } else if (OptionFormatter.DEFAULT_OPT_PREFIX.equals(arg)) {
+-                    tokens.add(OptionFormatter.DEFAULT_OPT_PREFIX);
+-                } else if (arg.startsWith(OptionFormatter.DEFAULT_OPT_PREFIX)) {
+-                    final String opt = Util.stripLeadingHyphens(arg);
+-                    if (options.hasOption(opt)) {
+-                        tokens.add(arg);
+-                    } else {
+-                        final int equalPos = DefaultParser.indexOfEqual(opt);
+-                        if (equalPos != -1 && options.hasOption(opt.substring(0, equalPos))) {
+-                            // the format is --foo=value or -foo=value
+-                            tokens.add(arg.substring(0, arg.indexOf(Char.EQUAL))); // --foo
+-                            tokens.add(arg.substring(arg.indexOf(Char.EQUAL) + 1)); // value
+-                        } else if (options.hasOption(arg.substring(0, 2))) {
+-                            // the format is a special properties option (-Dproperty=value)
+-                            tokens.add(arg.substring(0, 2)); // -D
+-                            tokens.add(arg.substring(2)); // property=value
+-                        } else {
+-                            eatTheRest = stopAtNonOption;
+-                            tokens.add(arg);
+-                        }
+-                    }
+-                } else {
+-                    tokens.add(arg);
+-                }
+-                if (eatTheRest) {
+-                    for (i++; i < arguments.length; i++) { // NOPMD
+-                        tokens.add(arguments[i]);
+-                    }
++            if (arg != null && flattenArgument(options, arg, stopAtNonOption, tokens)) {
++                for (i++; i < arguments.length; i++) { // NOPMD
++                    tokens.add(arguments[i]);
+                 }
+             }
+         }
+         return tokens.toArray(Util.EMPTY_STRING_ARRAY);
+     }
++
++    /**
++     * Flattens a single argument into tokens.
++     *
++     * @return whether the remaining arguments should be added without further processing.
++     */
++    private boolean flattenArgument(final Options options, final String arg, final boolean stopAtNonOption, final List<String> tokens) {
++        if (OptionFormatter.DEFAULT_LONG_OPT_PREFIX.equals(arg)) {
++            tokens.add(OptionFormatter.DEFAULT_LONG_OPT_PREFIX);
++            return true;
++        }
++        if (OptionFormatter.DEFAULT_OPT_PREFIX.equals(arg)) {
++            tokens.add(OptionFormatter.DEFAULT_OPT_PREFIX);
++            return false;
++        }
++        if (arg.startsWith(OptionFormatter.DEFAULT_OPT_PREFIX)) {
++            return flattenOption(options, arg, stopAtNonOption, tokens);
++        }
++        tokens.add(arg);
++        return false;
++    }
++
++    /**
++     * Flattens an argument that starts with a hyphen into tokens.
++     *
++     * @return whether the remaining arguments should be added without further processing.
++     */
++    private boolean flattenOption(final Options options, final String arg, final boolean stopAtNonOption, final List<String> tokens) {
++        final String opt = Util.stripLeadingHyphens(arg);
++        if (options.hasOption(opt)) {
++            tokens.add(arg);
++            return false;
++        }
++        final int equalPos = DefaultParser.indexOfEqual(opt);
++        if (equalPos != -1 && options.hasOption(opt.substring(0, equalPos))) {
++            // the format is --foo=value or -foo=value
++            tokens.add(arg.substring(0, arg.indexOf(Char.EQUAL))); // --foo
++            tokens.add(arg.substring(arg.indexOf(Char.EQUAL) + 1)); // value
++            return false;
++        }
++        if (options.hasOption(arg.substring(0, 2))) {
++            // the format is a special properties option (-Dproperty=value)
++            tokens.add(arg.substring(0, 2)); // -D
++            tokens.add(arg.substring(2)); // property=value
++            return false;
++        }
++        tokens.add(arg);
++        return stopAtNonOption;
++    }
+ }
+-- 
+2.38.1.windows.1
+
