@@ -1,0 +1,1 @@
+[{"PrNumber":45219,"PrAuthor":"fancive","Path":"packages/core/test/plugin/promise.test.ts","Additions":12,"Deletions":10},{"PrNumber":45219,"PrAuthor":"fancive","Path":"packages/plugin/src/promise/adapter.ts","Additions":7,"Deletions":2},{"PrNumber":45219,"PrAuthor":"fancive","Path":"packages/plugin/src/promise/tool.ts","Additions":8,"Deletions":1}]
