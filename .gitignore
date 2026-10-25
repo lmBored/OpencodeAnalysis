@@ -27,8 +27,7 @@ und/*.und
 und/files.txt
 
 # IDE
-.vscode/*
-!.vscode/settings.json
+.vscode/
 
 # Dependencies
 node_modules/
