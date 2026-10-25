@@ -1,0 +1,142 @@
+Only has one setup step assuming you have scoop. Scoop itself is also one step only. This was done on Windows 11. They have one line setups for every other OS, from Arch Linux, Linux, MacOS, to any other OS. They also present installation via package managers like npm, bun, nix, etc. Simple installability compliments their goal of making an accessible open-ended AI agent. Counted manually. Talk about access to installation from a non tech-savvy perspective.
+
+By going in opencode/packages/ai/src/providers and individually counting the provider .ts files, we've determined the model currently accepts 39 providers, not considering the capacity to run local models. Note that we have counted similarly named files (e.g. "zai-coding-plan.ts" and "zai.ts") as one instance, since they share the provider but (mostly) differ in API pricing and endpoints. While an impressive number, they are not close to accepting all model providers; a possible reason is the open source nature of this project, which implies that provider extensions are supported by contributors who know/typically use models from those providers, introducing a slight popularity bias.(bro idk maybe?????????????)(will return to it)
+
+
+By using ESLint (version 9.39.5) on the opencode repository, we have determined a max complexity of 363 in \path{\\opencode\\packages\\core\\src\\shell\\scan.ts}. Other high complexity files -> \path{opencode\\packages\\ui\\src\\theme\\resolve.ts} (181), \path{opencode\\packages\\tui\\src\\mini\\stream-v2.transport.ts} (146), \path{opencode\\packages\\client\\src\\solid\\data.ts}(131). Steps for reproducing results: pull github repo, cd into /OpencodeAnalysis/metrics/ and run the command  npx eslint . \verb|--|format json \verb|--output-file analysis/complexity.json|. Afterwards, cd into analysis and run node max-complexity.js. Findings were verified by cross-checking Max Complexity obtained via another tool (called Lizard).
+
+By running Lizard (version 1.24.1) on the same /analysis with the command "lizard . -l typescript -x "*/node\_modules/*" -x "*/dist/*" -x "*/analysis/*" --csv > analysis/lizard.csv" and then sorting the csv files by the second column (Cyclomatic Complexity), we find the max complexity of 355 in \path{\\opencode\\packages\\core\\src\\shell\\scan.ts}, the same file ESLint has found as the one with max CNN. A small difference is to be expected, as different tools may count nesting and logical operators differently. Scan is a reader for bash terminal code, which is the core interaction with the agent. That is where the similarity ends; both tools have mostly different results for other files/functions, such as ESLint's file with second highest CCN complexity (181) having a score of 9 according to Lizard. These differences show a fundamental difference in how the two tools compute CCN, a clear indicator to lacking conventions surrounding this concept. Despite to the tools's distinct results, the consensus in the placement and score of the max complexity file reinforces the idea that this is a correct representation of the project's max CCN. The high score is an indicator of the complexity of the program, fuckkkk its too late for this shit man idk kill me -- higher complexity means more ways the program to go, which is harder to track which is harder to test which means more vulnerabilities, tying it the software qualities. It's a dangerous position to be in, as the bash shell is a big vulnerability point yada yada exploit vulnerabilities yada abuse access to files yada yada. 
+
+Using skott 0.35.12, I determined the following results on coupling...decide whether I use Ca, Ce, or Instability measurement of coupling. Madge 8.0.0 confirms these results with minimal differences in values, but not placement (different handling in type imports and path aliases). High CA in index.ts suggests it is a barrel file. Discuss both advantages and disadvantages of using a barrel file in a project.
+
+Bun 1.4.3 (sanity check) and OSV Scanner (osv-scanner version: 2.7.0 with osv-scalibr version: 0.5.3) both report 0 vulnerable crypto.auth dependencies. However, osv mentions 30 vulnerable packages and bun 200 advisories.
+
+\textbf{CODE OF PLANTUML DIAGRAMS}
+
+Barrel file
+
+@startuml
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+component "parser.ts" as P
+component "validator.ts" as V
+component "writer.ts" as W
+component "index.ts\n(barrel)" as B
+component "app.ts\n(consumer)" as A
+
+B ..> P : re-exports
+B ..> V : re-exports
+B ..> W : re-exports
+A --> B : import { ... } from "./index"
+@enduml
+
+
+Singleton
+
+@startuml
+skinparam shadowing false
+
+class Config {
+  - {static} instance : Config
+  - Config()
+  + {static} getInstance() : Config
+  + get(key : string) : string
+}
+
+note right of Config
+  Private constructor.
+  getInstance() creates the
+  object once and returns the
+  same instance afterwards.
+end note
+
+class Client1
+class Client2
+Client1 ..> Config : getInstance()
+Client2 ..> Config : getInstance()
+@enduml
+
+
+Observer
+
+@startuml
+skinparam shadowing false
+
+interface Observer {
+  + update(event : Event)
+}
+
+class Subject {
+  - observers : Observer[]
+  + subscribe(o : Observer)
+  + unsubscribe(o : Observer)
+  + notify(event : Event)
+}
+
+class LogObserver
+class DatabaseObserver
+
+Subject o-- "0..*" Observer
+Observer <|.. LogObserver
+Observer <|.. DatabaseObserver
+@enduml
+
+Improvement on security uml file
+
+@startuml
+!option handwritten false
+
+actor User
+participant Application
+database "OS Secret Store" as Keyring
+database "Encrypted Database" as DB
+
+User -> Application: 1. Submit Input & Config
+Application -> Application: 2. Verify Config Integrity & Validate Input
+Application -> Keyring: 3. Retrieve Storage Key
+Keyring --> Application: Key
+Application -> DB: 4. Unlock & Execute Safe Query
+DB --> Application: Results
+Application --> User: 5. Response
+@enduml
+
+
+
+
+
+\begin{itemize}
+        \item \textbf{Maintainability, Modularity (evidence: strong).}
+        The root \href{https://github.com/anomalyco/opencode/blob/b471c2b4495747353af768fbf2e0790c9d820ce2/package.json#L25-L32}{\path{package.json} (L25--32)} declares Bun workspaces, so every package has its own \path{package.json} and declared dependencies. 
+        The dependency direction is an explicit rule in \href{https://github.com/anomalyco/opencode/blob/b471c2b4495747353af768fbf2e0790c9d820ce2/AGENTS.md#L3}{\path{AGENTS.md} (L3)}: \emph{``Keep runtime dependencies directed from Schema to Core and Protocol, then from Core and Protocol to Server. Client runtime code may depend on Schema and Protocol but never Core or Server''}.
+
+        \item \textbf{Maintainability, Testability (evidence: strong).}
+        Every package has a \path{test/} directory mirroring \path{src/}. For example, \path{packages/core/test/} has 88 entries against 83 in \path{packages/core/src/}, including \path{permission.test.ts} for \path{permission.ts} and \path{credential.test.ts} for \path{credential.ts}. 
+        Tests run on every push to \texttt{dev} and on every PR in \href{https://github.com/anomalyco/opencode/blob/b471c2b4495747353af768fbf2e0790c9d820ce2/.github/workflows/test.yml#L66-L80}{\path{.github/workflows/test.yml} (L66--80)}: unit tests via \texttt{bun turbo test}, a generated client check, and HttpApi ``exerciser gates'', on both Linux and Windows. 
+        Playwright end-to-end tests follow at L136--137, and \path{typecheck.yml} runs \texttt{bun typecheck}. 
+        One inconvenience and unconventional practice is that tests cannot run from the repository root (\href{https://github.com/anomalyco/opencode/blob/b471c2b4495747353af768fbf2e0790c9d820ce2/AGENTS.md#L141-L145}{\path{AGENTS.md} L141--145}); they have to be run per package. 
+
+        \item \textbf{Security, Confidentiality (evidence: weak).}
+        Provider credentials are stored in the local SQLite database. 
+        The table in \href{https://github.com/anomalyco/opencode/blob/b471c2b4495747353af768fbf2e0790c9d820ce2/packages/core/src/credential/sql.ts#L5-L14}{\path{packages/core/src/credential/sql.ts} (L5--14)} defines the secret as a plain JSON text column (\texttt{value: text(\{ mode: "json" \})}), and \href{https://github.com/anomalyco/opencode/blob/b471c2b4495747353af768fbf2e0790c9d820ce2/packages/core/src/credential.ts#L108-L116}{\path{credential.ts} (L108--116)} inserts \texttt{credential.value} as it is. 
+        We also searched \path{packages/core}, \path{packages/opencode}, and \path{packages/server} for \texttt{encrypt}, \texttt{keychain}, \texttt{keytar}, or \texttt{safeStorage}, but found no encryption at rest and no OS keychain integration.
+        \textbf{Outcome:} secrets are protected only by file system permissions, so we rate this evidence as weak. 
+        
+        \item \textbf{Security, Resistance (evidence: absent by design).}
+        The project states explicitly that it provides no isolation: \emph{``OpenCode does \textbf{not} sandbox the agent. The permission system exists as a UX feature [\ldots] it is not designed to provide security isolation. If you need true isolation, run OpenCode inside a Docker container or VM''} (\href{https://github.com/anomalyco/opencode/blob/b471c2b4495747353af768fbf2e0790c9d820ce2/SECURITY.md#L15-L19}{\path{SECURITY.md} L15--19}), and it lists ``sandbox escapes'' as out of scope (L30). 
+        The codebase also aligns with this: \href{https://github.com/anomalyco/opencode/blob/b471c2b4495747353af768fbf2e0790c9d820ce2/packages/core/src/permission.ts#L76-L86}{\path{packages/core/src/permission.ts} (L76--86)} only matches an action/resource pair against wildcard rules and falls back to \texttt{"ask"}, and an agent without rules gets a ruleset that \texttt{"deny"} everything (L15). 
+        This default prompts the user, which is reasonable, but the check runs inside the same process as the shell tool, so it offers no protection against a compromised model or a malicious plugin.
+        Moreover, plugins can even override decisions through the \texttt{"permission.ask"} hook (\href{https://github.com/anomalyco/opencode/blob/b471c2b4495747353af768fbf2e0790c9d820ce2/packages/plugin/src/index.ts#L261}{\path{packages/plugin/src/index.ts} L261}). 
+        \textbf{Outcome:} we found no evidence of resistance against attacks, and it seems that the project hands this responsibility to the user.
+
+        \item \textbf{Flexibility, Adaptability (evidence: strong).}
+        Models and providers are not hard-coded (which is also one of the core selling points of OpenCode).
+        \href{https://github.com/anomalyco/opencode/blob/b471c2b4495747353af768fbf2e0790c9d820ce2/packages/core/src/models-dev.ts#L67-L132}{\path{packages/core/src/models-dev.ts} (L67--132)} defines schemas for an external model catalog (models.dev), and \path{packages/core/src/provider.ts} only re-exports provider types (\texttt{AISDK}, \texttt{Native}, \texttt{Api}), so a new provider can be added as a catalog entry without changing the codebase.
+        The public plugin API in \href{https://github.com/anomalyco/opencode/blob/b471c2b4495747353af768fbf2e0790c9d820ce2/packages/plugin/src/index.ts#L216-L334}{\path{packages/plugin/src/index.ts} (L216--334)} defines about twenty hooks, including \texttt{models}, \texttt{chat.params}, \texttt{chat.headers}, \texttt{tool.execute.before/after}, \texttt{shell.env} and \texttt{tool.definition}. This design lets users adapt model selection, requests, tools and the shell environment straight from UI and config files. However, we notice the \texttt{experimental.*} prefix on several hooks, which shows that parts of this API surface are not yet stable.
+
+        \item \textbf{Flexibility, Installability (evidence: strong).}
+        There are three main points that cover installability.
+        First, \href{https://github.com/anomalyco/opencode/blob/b471c2b4495747353af768fbf2e0790c9d820ce2/install#L81-L165}{\path{install} script (L81--165)} detects the operating system (Darwin, Linux, MINGW/MSYS/Cygwin), the CPU architecture, the C library (musl vs.\ glibc) and AVX2 support, and chooses one of five target binaries (\texttt{linux-x64}, \texttt{linux-arm64}, \texttt{darwin-x64}, \texttt{darwin-arm64}, \texttt{windows-x64}) with \texttt{-baseline} and \texttt{-musl} variants. 
+        Second, package manager installation is also covered: \href{https://github.com/anomalyco/opencode/blob/b471c2b4495747353af768fbf2e0790c9d820ce2/README.md#L50-L61}{\path{README.md} (L50--61)} lists \texttt{curl}, npm/bun/pnpm/yarn, Scoop, Chocolatey, Homebrew, AUR and Nix, and \href{https://github.com/anomalyco/opencode/blob/b471c2b4495747353af768fbf2e0790c9d820ce2/flake.nix#L11-L15}{\path{flake.nix} (L11--15)} builds for four Nix systems. 
+        Third, releases are automated by \path{.github/workflows/publish.yml}, which reduces the risk of broken manual releases.
+    \end{itemize}

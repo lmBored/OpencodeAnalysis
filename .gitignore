@@ -29,5 +29,17 @@ und/files.txt
 # IDE
 .vscode/
 
-# Dependencies
+# OS / IDE / Python
+.vs/
+.idea/
+*.user
+*.suo
+__pycache__/
+*.pyc
+.DS_Store
+
+# Opencode repository and installed dependencies
+metrics/opencode/
+metrics/node_modules/
+metrics/analysis/node_modules/
 node_modules/
