@@ -41,4 +41,30 @@ public static class LatexWriter
         sb.AppendLine(@"\endgroup");
         return sb.ToString();
     }
+
+    public static string Table(string caption, string label, string[] header, string colSpec, IEnumerable<string[]> rows,
+        IEnumerable<string[]>? footerRows = null)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine(@"\begin{table}[htbp]");
+        sb.AppendLine(@"\footnotesize");
+        sb.AppendLine(@"\setlength{\tabcolsep}{4pt}");
+        sb.AppendLine(@"\renewcommand{\arraystretch}{1.2}");
+        sb.AppendLine($@"\caption{{{caption}}}");
+        sb.AppendLine($@"\label{{{label}}}");
+        sb.AppendLine($@"\begin{{tabular}}{{{colSpec}}}");
+        sb.AppendLine(@"\hline");
+        sb.AppendLine(string.Join(" & ", header.Select(h => $"\\textbf{{{h}}}")) + @" \\");
+        sb.AppendLine(@"\hline");
+        foreach (var r in rows) sb.AppendLine(string.Join(" & ", r) + @" \\");
+        if (footerRows is not null)
+        {
+            sb.AppendLine(@"\hline");
+            foreach (var r in footerRows) sb.AppendLine(string.Join(" & ", r) + @" \\");
+        }
+        sb.AppendLine(@"\hline");
+        sb.AppendLine(@"\end{tabular}");
+        sb.AppendLine(@"\end{table}");
+        return sb.ToString();
+    }
 }
