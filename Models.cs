@@ -80,3 +80,23 @@ public record BotEvidence(
     double HourEntropy,
     bool IsBot,
     string Reason);
+
+public record PersonActivity(
+    string PersonId,
+    string Category,
+    bool Key,
+    bool Regular,
+    bool Newcomer,
+    bool Casual,
+    bool Dormant,
+    int Commits,
+    int PrsOpened,
+    int PrsMerged,
+    int Reviews,
+    int ReviewComments,
+    int IssueComments,
+    int IssuesOpened,
+    DateTimeOffset First,
+    DateTimeOffset Last,
+    int ActiveMonths,
+    int ActiveDays);
