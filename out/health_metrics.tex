@@ -1,0 +1,24 @@
+\begin{table}[htbp]
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\caption{Contributor categories and process metrics for 31{,}814 human persons active between 27 September 2025 and 26 September 2026; thresholds are derived from the data.}
+\label{tab:health-metrics}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.12\textwidth} >{\raggedright\arraybackslash}p{0.33\textwidth} >{\raggedright\arraybackslash}p{0.17\textwidth} >{\raggedright\arraybackslash}p{0.30\textwidth}}
+\hline
+\textbf{Metric} & \textbf{Definition} & \textbf{Threshold} & \textbf{Value} \\
+\hline
+Key & Smallest set of persons who author 80\% of merged human PRs & top 20 (knee of the curve) & 20 persons, 80\% of merged PRs; 17 in \texttt{TEAM\_MEMBERS} \\
+Regular & Not key; active in $\geq$3 calendar months & 3 months = one quarter & 1{,}910 persons \\
+Occasional & Not key or regular; $\geq$2 contributions & -- & 12{,}751 persons \\
+Casual & Exactly one contribution of any kind & 1 & 17{,}133 persons (54\%) \\
+Newcomer & No PR, issue or commit before the window & window start & 31{,}351 persons (99\%) \\
+Dormant & Not casual; silent at window end for longer than the usual gap & 51 days (P90 gap of regulars) & 11{,}229 of 14{,}681 (76\%) \\
+Merge rate & Merged / opened PRs, by author group & -- & key 80\%, outside newcomer 12\%, casual 0\% \\
+First response & Hours from PR opened to the first comment or review by another human & median & key 16.6 h, outside newcomer 65.6 h; never answered: 74\% of outside-newcomer PRs \\
+Auto-closed & PR closed with a workflow close comment & 3 templates & key 5\%, outside newcomer 52\%, all 34\% \\
+Retention & Newcomer active again 30--90 days after the first contribution & 30 days, 90-day horizon & 13\% of 21{,}792; first contribution a PR: 16\% \\
+Review load & Share of human reviews done by the top 3 reviewers & top 3 & 56\% of 1{,}243 (\texttt{rekram1-node}, \texttt{atharvau}, \texttt{Hona}) \\
+\hline
+\end{tabular}
+\end{table}

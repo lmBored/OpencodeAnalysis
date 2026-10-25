@@ -1,0 +1,26 @@
+\begin{table}[htbp]
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\caption{Filtering measures for bots (M1--M4) and multi-account use (A1--A3), with what each one flagged and an example account.}
+\label{tab:health-filtering}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.09\textwidth} >{\raggedright\arraybackslash}p{0.33\textwidth} >{\raggedright\arraybackslash}p{0.15\textwidth} >{\raggedright\arraybackslash}p{0.35\textwidth}}
+\hline
+\textbf{} & \textbf{Measure} & \textbf{Flagged} & \textbf{Example} \\
+\hline
+M1 & Account type is \texttt{Bot} or login ends in \texttt{[bot]} & 16 logins & \href{https://github.com/apps/github-actions}{\texttt{github-actions[bot]}}: 53{,}937 comments (42\% of all) \\
+M2 & Known automation identity & 4 logins & \href{https://github.com/actions-user}{\texttt{actions-user}} (``GitHub Action''): 850 commits \\
+M3 & $\geq$50\% of $\geq$10 texts repeat a template & 24 logins (not alone) & \href{https://github.com/thdxr}{\texttt{thdxr}}: 65\% templated \\
+M4 & Hour-of-day entropy $\geq$0.95 over $\geq$50 events & 2 logins (not alone) & \href{https://github.com/ariane-emory}{\texttt{ariane-emory}}: entropy 0.98 \\
+M3$\wedge$M4 & Bot-like on both, or manual verdict on the top-15 scores & 0 + 1 manual & \href{https://github.com/Enough1122}{\texttt{Enough1122}}: 91\% templated ``automated review'' comments \\
+A1 & One e-mail used under several names & 19 e-mails & \href{https://github.com/adamdotdevin}{\texttt{adamdotdevin}} (4 names, 2 e-mails) \\
+A2 & One distinctive name used with several e-mails & 28 links & \href{https://github.com/R44VC0RP}{\texttt{R44VC0RP}} (2 names, 3 e-mails) \\
+A3 & Login read from a \texttt{noreply} e-mail & 48 links & \href{https://github.com/enchantednatures}{\texttt{enchantednatures}} (1 name, 2 e-mails) \\
+Manual & Reviewed overrides: merged logins and e-mails, blocked names & 3 merges, 1 refusals & \href{https://github.com/ryanwyler}{\texttt{ryanwyler}} = \href{https://github.com/ryanwyler}{\texttt{ryangamerdev}} (renamed) \\
+Renamed & \texttt{noreply} login differs from the linked login & 12 accounts & \href{https://github.com/adamdotdevin}{\texttt{adamdotdevin}} (was \texttt{adamdottv}) \\
+Shared & One bot account used by many humans & 22 co-authors & \href{https://github.com/apps/opencode-agent}{\texttt{opencode-agent[bot]}}: 19 humans call it with \texttt{/opencode} \\
+\hline
+Result & Bots removed; aliases merged & 26 bot or deleted persons & 35{,}462 identities $\rightarrow$ 35{,}300 human persons (all time) \\
+\hline
+\end{tabular}
+\end{table}
