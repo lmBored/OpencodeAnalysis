@@ -1,0 +1,1 @@
+[{"PrNumber":8995,"PrAuthor":"jerome-benoit","Path":".github/workflows/nix-desktop.yml","Additions":3,"Deletions":1},{"PrNumber":8995,"PrAuthor":"jerome-benoit","Path":".github/workflows/update-nix-hashes.yml","Additions":170,"Deletions":32},{"PrNumber":8995,"PrAuthor":"jerome-benoit","Path":"nix/scripts/update-hashes.sh","Additions":0,"Deletions":119}]

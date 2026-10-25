@@ -31,6 +31,10 @@ merge_rate,outside-newcomer,0.120,12254
 human_response_share,outside-newcomer,0.263,12254
 first_human_response_median_h,outside-newcomer,65.6,12254
 auto_closed_share,outside-newcomer,0.520,12254
+merge_rate,newcomer-team,0.802,4570
+human_response_share,newcomer-team,0.044,4570
+first_human_response_median_h,newcomer-team,11.5,4570
+auto_closed_share,newcomer-team,0.050,4570
 merge_rate,team,0.815,7715
 human_response_share,team,0.057,7715
 first_human_response_median_h,team,14.6,7715
@@ -44,6 +48,8 @@ auto_closed_kind,pr-compliance,0.084,1727
 auto_closed_kind,pr-stale,0.077,1583
 issue_auto_closed_kind,issue-compliance,0.111,2895
 issue_auto_closed_kind,issue-stale,0.361,9401
+issue_stale_no_team,all,8260,9401
+issue_stale_no_human,all,4537,9401
 newcomer_retention,all,0.128,21792
 newcomer_retention_first_pr,all,0.159,2439
 newcomer_retention_first_issue,all,0.127,9048

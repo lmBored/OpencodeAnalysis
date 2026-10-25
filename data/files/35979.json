@@ -1,0 +1,1 @@
+[{"PrNumber":35979,"PrAuthor":"HOYALIM","Path":"packages/llm/src/protocols/openai-chat.ts","Additions":6,"Deletions":2},{"PrNumber":35979,"PrAuthor":"HOYALIM","Path":"packages/llm/test/provider/openai-compatible-chat.test.ts","Additions":42,"Deletions":0}]
