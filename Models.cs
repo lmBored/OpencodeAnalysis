@@ -64,3 +64,7 @@ public record IssueRecord(
     string Url);
 
 public record UserProfile(string Login, string Type, DateTimeOffset CreatedAt, string? Name, string? Bio, int PublicRepos, int Followers);
+
+// One person after merging aliases
+// Login is the primary account, MergedBy lists rules that linked identities
+public record Person(string Id, string? Login, string[] Logins, string[] Names, string[] Emails, int RawIdentities, string MergedBy);
