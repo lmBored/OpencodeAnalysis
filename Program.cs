@@ -3,6 +3,7 @@ using OpenCodeAnalysis;
 const int Seed = 42;
 const int TopN = 10;
 const int FilesSamplePerAuthor = 150;
+var RepoCreated = new DateTimeOffset(2025, 4, 1, 0, 0, 0, TimeSpan.Zero);
 
 var projectDir = FindProjectDir();
 var cache = new Cache(Path.Combine(projectDir, "data"));
@@ -32,6 +33,9 @@ switch (command)
     case "activities":
         Reports.Activities(Dataset.Load(cache), run, outDir, TopN);
         break;
+    case "fetch-health":
+        await FetchHealth();
+        break;
     case "all":
         await Fetch();
         var data = Dataset.Load(cache);
@@ -39,7 +43,7 @@ switch (command)
         Reports.Collaboration(data, run, outDir, TopN);
         break;
     default:
-        Console.Error.WriteLine("usage: dotnet run -- [fetch|contributors|collaboration|activities|all]");
+        Console.Error.WriteLine("usage: dotnet run -- [fetch|contributors|collaboration|activities|fetch-health|all]");
         return 1;
 }
 return 0;
@@ -109,6 +113,47 @@ async Task Fetch()
     cache.Write("files_sample", sample.Select(p => p.Number).ToList());
     cache.Write("targeted", targeted);
     Console.WriteLine($"Fetch complete; API calls made in this run: {gh.ApiCalls}");
+}
+
+/// Health part: issues, PRs before the window, commits before the window, profiles of reviewed accounts.
+async Task FetchHealth()
+{
+    var gh = new GitHubFetcher(cache);
+
+    Console.WriteLine("Issues and PRs, all time (issues endpoint) ...");
+    var issues = await gh.IssuesAsync(run, RepoCreated);
+    var prior = await gh.PullsBeforeWindowAsync(run, RepoCreated);
+    Console.WriteLine($"  {issues.Count} issues opened in window, {prior.Count} PRs opened before the window");
+
+    Console.WriteLine("Commits before the window (local clone) ...");
+    var priorCommits = cache.GetOrFetch("prior_commits", () => Task.FromResult(LocalCommits(run.Since))).Result;
+    Console.WriteLine($"  {priorCommits.Count} commits before {run.Since:yyyy-MM-dd}");
+
+    var data = Dataset.Load(cache);
+    var overrides = IdentityOverrides.Load(Path.Combine(projectDir, "data", "identity_overrides.json"));
+    var review = BotDetector.Evaluate(data, run, overrides).ReviewList;
+    Console.WriteLine($"Profiles of {review.Count} accounts under review ...");
+    foreach (var login in review)
+        await gh.UserAsync(login);
+    Console.WriteLine($"Health fetch complete; API calls made in this run: {gh.ApiCalls}");
+}
+
+/// Commits of local clone authored before `until`
+List<CommitRecord> LocalCommits(DateTimeOffset until)
+{
+    var psi = new System.Diagnostics.ProcessStartInfo("git",
+        ["-C", Path.Combine(projectDir, "opencode"), "log", $"--before={until:yyyy-MM-ddTHH:mm:ssZ}",
+            "--format=%H%x1f%aN%x1f%aE%x1f%aI%x1f%s"])
+    {
+        RedirectStandardOutput = true,
+    };
+    using var git = System.Diagnostics.Process.Start(psi)!;
+    var lines = git.StandardOutput.ReadToEnd().Split('\n', StringSplitOptions.RemoveEmptyEntries);
+    git.WaitForExit();
+    return lines.Select(l => l.Split('\u001f'))
+        .Where(f => f.Length >= 5 && DateTimeOffset.Parse(f[3]) < until)
+        .Select(f => new CommitRecord(f[0], null, GhCore.Bots.IsBot(f[1]), f[1], f[2], DateTimeOffset.Parse(f[3]), f[4]))
+        .ToList();
 }
 
 static string FindProjectDir()
