@@ -68,3 +68,15 @@ public record UserProfile(string Login, string Type, DateTimeOffset CreatedAt, s
 // One person after merging aliases
 // Login is the primary account, MergedBy lists rules that linked identities
 public record Person(string Id, string? Login, string[] Logins, string[] Names, string[] Emails, int RawIdentities, string MergedBy);
+
+// Bot measures M1-M4 for one login
+public record BotEvidence(
+    string Login,
+    int Events,
+    int Texts,
+    bool TypeBot,
+    bool KnownAutomation,
+    double TemplateRatio,
+    double HourEntropy,
+    bool IsBot,
+    string Reason);
