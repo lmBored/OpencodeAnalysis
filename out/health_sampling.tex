@@ -1,0 +1,17 @@
+\begin{table}[htbp]
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\caption{Sampling plan: where we sample, how, and why; quantitative metrics use the full population.}
+\label{tab:health-sampling}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.17\textwidth} >{\raggedright\arraybackslash}p{0.13\textwidth} >{\raggedright\arraybackslash}p{0.22\textwidth} >{\raggedright\arraybackslash}p{0.15\textwidth} >{\raggedright\arraybackslash}p{0.23\textwidth}}
+\hline
+\textbf{Question} & \textbf{Approach} & \textbf{Frame} & \textbf{Size} & \textbf{Why} \\
+\hline
+All metrics in Table~\ref{tab:health-metrics} & None (full population) & 22{,}011 PRs, 26{,}076 issues, 127{,}583 comments, 12{,}951 commits & -- & All data is available, so sampling would only add error \\
+Precision of merged identities & Simple random & human persons with $>$1 identity & 30 (seed 42) & Every group has the same chance; checks the rules, not one person \\
+Bot flags & Targeted & logins with $\geq$50 events, not M1/M2 & top 15 by M3+M4, plus 3 borderline & Errors hide at the top of the score \\
+Fate of newcomer PRs & Stratified (quarter $\times$ team) & 16{,}824 newcomer PRs & 54 (6 in each of 9 non-empty strata, seed 42) & Covers every policy period and the rare team newcomers \\
+\hline
+\end{tabular}
+\end{table}

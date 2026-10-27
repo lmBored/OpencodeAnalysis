@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>GhActivities</AssemblyName>
+    <RootNamespace>GhActivities</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Octokit" Version="14.0.0" />
+    <PackageReference Include="Octokit.GraphQL" Version="0.4.0-beta" />
+    <ProjectReference Include="..\GhCore\GhCore.csproj" />
+  </ItemGroup>
+
+</Project>

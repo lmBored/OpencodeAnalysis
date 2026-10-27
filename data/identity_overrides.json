@@ -1,0 +1,81 @@
+{
+  // Hand-checked exceptions to the identity rules A1-A3 and verdicts of the manual checks (out/health_samples.md).
+  // Every entry was reviewed against commits, comments and the GitHub profile on 2026-10-25.
+
+  // Shared or placeholder e-mails that must never link two identities (none found among the 19 e-mails with several names).
+  "blockedEmails": [],
+
+  // Common first names or generic words: never used to link identities, also not as "name equals login".
+  // "tito" is the commit name of mynameistito, but the login "tito" belongs to a different, unrelated account.
+  "blockedNames": ["tito", "test", "user", "root", "admin", "dev", "developer", "github"],
+
+  // Several logins of one person (first = primary).
+  // ryangamerdev was renamed to ryanwyler between the two fetches (same commit e-mail ryan@bridgetone.com, old login now 404).
+  // xfdwcympxu-bit (created 2026-04-16) commits under the name "tctev", the account that opened a PR on 2026-02-19.
+  "mergeLogins": [
+    ["ryanwyler", "ryangamerdev"],
+    ["tctev", "xfdwcympxu-bit"]
+  ],
+
+  // Commit e-mails that no rule links to an account. "Frank" alone is too common for A2, but
+  // frank@sst.dev (May-Dec 2025) is Frank Wang before SST became Anomaly; from then on he commits
+  // as "Frank" <frank@anoma.ly>, which GitHub links to fwang. Understand counts both as one name.
+  "mergeEmails": {
+    "frank@sst.dev": "fwang"
+  },
+
+  // Verdicts for the random sample of 30 merged groups (seed 42): "same" or "different" person.
+  // Checked: names, e-mail domains, noreply user ids and the GitHub profile.
+  "groupVerdicts": {
+    "fwang": "same (manual e-mail override, SST renamed to Anomaly)",
+    "spoons-and-mirrors": "same (one noreply e-mail, Baptiste Cavallo / Spoon)",
+    "R44VC0RP": "same (Ryan Vogel; all three e-mails linked by GitHub)",
+    "max-pod": "same (noreply id)",
+    "omarshaarawi": "same (noreply id)",
+    "ugur-murat-alt": "same (renamed from vaur94, same noreply id)",
+    "sonsulee": "same (noreply id)",
+    "tobias-walle": "same (noreply id)",
+    "u-yuta": "same (noreply login)",
+    "jeremyosih": "same (Jeremy Osih on both e-mails)",
+    "rmoriz": "same (noreply login)",
+    "et0and": "same (noreply id)",
+    "jedisct1": "same (noreply id)",
+    "neriousy": "same (name equals login; Filip in both)",
+    "ryanskidmore": "same (both e-mails linked by GitHub)",
+    "Brendonovich": "same (Brendan Allan, three e-mails)",
+    "snipeship": "same (one e-mail, YJG / Ytzhak)",
+    "muzzlol": "same (noreply id)",
+    "iamdavidhill": "same (David Hill, both e-mails)",
+    "enchantednatures": "same (Hunter Casten on both e-mails)",
+    "b0tmtl": "same (noreply id)",
+    "i-m-sid": "same (noreply id)",
+    "ezynda3": "same (noreply login)",
+    "tctev": "same (manual override, second account)",
+    "ericc-ch": "same (noreply id)",
+    "brinsilelias": "same (noreply id)",
+    "garrettladley": "same (noreply id)",
+    "szymon": "same (noreply id)",
+    "tyrellshawn": "same (noreply login)",
+    "neominik": "same (Dominik Engelhardt on both e-mails)"
+  },
+
+  // Verdicts for the targeted sample and the borderline cases: "bot", "human" or "borderline: ...".
+  "botVerdicts": {
+    "Enough1122": "bot: personal account whose comments are AI code reviews labelled 'automated review'",
+    "sdivyanshu90": "human: repeats 'Could you please review this PR?' pings at human hours",
+    "thdxr": "human: founder; the templated texts are the stale-issue script run from his account",
+    "sauerdaniel": "human: short status and closing notes",
+    "rekram1-node": "human: maintainer Aiden Cline; very active but varied texts",
+    "fwang": "human: co-founder; spread over the day but conversational texts",
+    "Hona": "human: maintainer Luke Parker",
+    "herjarsa": "human: long AI-assisted write-ups, posted at human hours",
+    "CasualDeveloper": "human",
+    "sjawhar": "human",
+    "ryangamerdev": "human (renamed to ryanwyler)",
+    "mguttmann": "human",
+    "ariane-emory": "human: active around the clock, but conversational texts",
+    "raymelon": "human",
+    "ghost": "borderline: placeholder for deleted accounts, not one person; left out of person counts",
+    "opencode-agent[bot]": "borderline: bot account, but every run is started by a human (co-authors, /opencode commands)"
+  }
+}
